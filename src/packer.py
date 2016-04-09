@@ -1,6 +1,6 @@
 class Packer:
-    def pack(self, tiles):
+    def pack(self, tiles, padding):
         raise NotImplementedError('Has to be implemented')
 
-    def write(self, file):
+    def size(self):
         raise NotImplementedError('Has to be implemented')

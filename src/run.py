@@ -1,5 +1,6 @@
 import argparse
 import os
+import math
 
 from modes import PackMode
 from tile import Tile
@@ -39,6 +40,10 @@ if __name__ == "__main__":
                         help='The packing mode to use.')
     parser.add_argument('-p', '--padding', dest='padding', type=int, default=1,
                         help='The padding between each tile.')
+    parser.add_argument('-p2', '--pow2', dest='pow',
+                        help='Make the width and height of the output image power of 2.')
+    parser.add_argument('-sqr', '--square', dest='square',
+                        help='Make output image square.')
 
     args = parser.parse_args()
     tiles = []
@@ -55,7 +60,19 @@ if __name__ == "__main__":
 
     if args.packmode == PackMode.Tight:
         packer = TightPacker()
-        packer.pack(tiles)
-        packer.write(args.output)
+        packer.pack(tiles, args.padding)
     elif args.packmode == PackMode.VarAnim:
         raise NotImplementedError()
+
+    w, h = packer.size()
+
+    # Setup sizes
+    if args.pow:
+        w = math.pow(2, math.ceil(math.log2(w)))
+        h = math.pow(2, math.ceil(math.log2(h)))
+
+    if args.square:
+        w = max(w, h)
+        h = w
+
+    # Draw image:
