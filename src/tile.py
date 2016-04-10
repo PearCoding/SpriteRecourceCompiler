@@ -16,7 +16,7 @@ class Tile:
     variation = 0
     frame = 0
 
-    def __init__(self, file, mode):
+    def __init__(self, file):
         self.image = Image.open(file)
         self.width = self.image.width
         self.height = self.image.height
