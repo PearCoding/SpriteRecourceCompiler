@@ -7,7 +7,10 @@ from tile import Tile
 from tight_packer import TightPacker
 from filter import Filter
 
-from PIL import Image, ImageDraw
+from padding.color_padding import ColorPadding
+from padding.fill_padding import FillPadding
+
+from PIL import Image
 
 APP_NAME = "SpriteResourceCompiler (SRC)"
 APP_VERSION = "0.1"
@@ -42,6 +45,10 @@ def get_padding_mode(string):
         return PaddingMode.Transparent
     elif string.lower() == 'black':
         return PaddingMode.Black
+    elif string.lower() == 'white':
+        return PaddingMode.White
+    elif string.lower() == 'magenta':
+        return PaddingMode.Magenta
     else:
         return PaddingMode.Fill
 
@@ -139,51 +146,18 @@ if __name__ == "__main__":
         image.paste(tile.image, (tile.x, tile.y))
 
     # Fill padding:
-    # TODO: Better to encapsulate it in another class
-    padding = args.padding
-    if padding > 0:
-        drawer = ImageDraw.Draw(image)
-        black = (0, 0, 0, 255)
-        if args.padding_mode != PaddingMode.Transparent:
-            for tile in tiles:
-                if tile.x > padding:
-                    if args.padding_mode == PaddingMode.Black:
-                        drawer.rectangle((tile.x - padding, tile.y, tile.x - 1, tile.y + tile.height - 1), black)
-                    else:  # Fill
-                        for y in range(tile.y, tile.y + tile.height):
-                            pixel = tile.image.getpixel((0, y - tile.y))
-                            for x in range(tile.x - padding, tile.x):
-                                drawer.point((x, y), pixel)
+    if args.padding > 0 and args.padding_mode != PaddingMode.Transparent:
+        padder = None
+        if args.padding_mode == PaddingMode.Black:
+            padder = ColorPadding()
+        elif args.padding_mode == PaddingMode.White:
+            padder = ColorPadding((255, 255, 255, 255))
+        elif args.padding_mode == PaddingMode.Magenta:
+            padder = ColorPadding((255, 0, 255, 255))
+        elif args.padding_mode == PaddingMode.Fill:
+            padder = FillPadding()
 
-                if tile.y > padding:
-                    if args.padding_mode == PaddingMode.Black:
-                        drawer.rectangle((tile.x, tile.y - padding, tile.x + tile.width - 1, tile.y - 1), black)
-                    else:  # Fill
-                        for x in range(tile.x, tile.x + tile.width):
-                            pixel = tile.image.getpixel((x - tile.x, 0))
-                            for y in range(tile.y - padding, tile.y):
-                                drawer.point((x, y), pixel)
-                        pass
-
-                if tile.x + tile.width < w - 1:  # It's ok to draw over the canvas
-                    if args.padding_mode == PaddingMode.Black:
-                        drawer.rectangle((tile.x + tile.width, tile.y,
-                                          tile.x + tile.width + padding - 1, tile.y + tile.height - 1), black)
-                    else:  # Fill
-                        for y in range(tile.y, tile.y + tile.height):
-                            pixel = tile.image.getpixel((tile.width - 1, y - tile.y))
-                            for x in range(tile.x + tile.width, tile.x + tile.width + padding):
-                                drawer.point((x, y), pixel)
-
-                if tile.y + tile.height < h - 1:  # It's ok to draw over the canvas
-                    if args.padding_mode == PaddingMode.Black:
-                        drawer.rectangle((tile.x, tile.y + tile.height,
-                                          tile.x + tile.width - 1, tile.y + tile.height + padding - 1), black)
-                    else:  # Fill
-                        for x in range(tile.x, tile.x + tile.width):
-                            pixel = tile.image.getpixel((x - tile.x, tile.height - 1))
-                            for y in range(tile.y + tile.height, tile.y + tile.height + padding):
-                                drawer.point((x, y), pixel)
+        padder.fill(image, tiles, args.padding)
 
     print("Output: {} [{}x{}]".format(args.output, image.width, image.height))
     image.save(args.output)
