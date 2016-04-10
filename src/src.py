@@ -54,8 +54,10 @@ if __name__ == "__main__":
                         help='the output file')
     parser.add_argument('-r', '--recursive', dest='recursive', action='store_true',
                         help='search directories and subdirectories recursively')
-    parser.add_argument('-f', '--filter', dest='filters', nargs='*',
-                        help='add a filter file containing filters for filenames')
+    parser.add_argument('-f', '--filter', dest='filter', nargs='*',
+                        help='add a filter for filenames (wildcard)')
+    parser.add_argument('-ff', '--filter-file', dest='filterfile', nargs='*',
+                        help='add a filter file containing filters for filenames (wildcard)')
     parser.add_argument('-m', '--mode', dest='packmode', type=get_pack_mode,
                         choices=list(PackMode), default=PackMode.Tight,
                         help='the packing mode to use while generating the output')
@@ -74,10 +76,13 @@ if __name__ == "__main__":
 
     # Init optional filters
     filter = None
-    if args.filters:
+    if args.filter or args.filterfile:
         filter = Filter()
 
-        for path in args.filters:
+        for case in args.filter:
+            filter.add(case)
+
+        for path in args.filterfile:
             filter.parse(path)
 
     # Read image files
@@ -103,7 +108,7 @@ if __name__ == "__main__":
     tiles.sort(key=lambda p: p.area())
 
     if len(tiles) == 0:
-        if args.filters:
+        if args.filter or args.filterfile:
             print('Nothing to pack. Maybe check filters?')
         else:
             print('Nothing to pack.')
@@ -135,49 +140,50 @@ if __name__ == "__main__":
 
     # Fill padding:
     # TODO: Better to encapsulate it in another class
-    drawer = ImageDraw.Draw(image)
     padding = args.padding
-    black = (0, 0, 0, 255)
-    if args.padding_mode != PaddingMode.Transparent:
-        for tile in tiles:
-            if tile.x > padding:
-                if args.padding_mode == PaddingMode.Black:
-                    drawer.rectangle((tile.x - padding, tile.y, tile.x - 1, tile.y + tile.height - 1), black)
-                else:  # Fill
-                    for y in range(tile.y, tile.y + tile.height):
-                        pixel = tile.image.getpixel((0, y - tile.y))
-                        for x in range(tile.x - padding, tile.x):
-                            drawer.point((x, y), pixel)
+    if padding > 0:
+        drawer = ImageDraw.Draw(image)
+        black = (0, 0, 0, 255)
+        if args.padding_mode != PaddingMode.Transparent:
+            for tile in tiles:
+                if tile.x > padding:
+                    if args.padding_mode == PaddingMode.Black:
+                        drawer.rectangle((tile.x - padding, tile.y, tile.x - 1, tile.y + tile.height - 1), black)
+                    else:  # Fill
+                        for y in range(tile.y, tile.y + tile.height):
+                            pixel = tile.image.getpixel((0, y - tile.y))
+                            for x in range(tile.x - padding, tile.x):
+                                drawer.point((x, y), pixel)
 
-            if tile.y > padding:
-                if args.padding_mode == PaddingMode.Black:
-                    drawer.rectangle((tile.x, tile.y - padding, tile.x + tile.width - 1, tile.y - 1), black)
-                else:  # Fill
-                    for x in range(tile.x, tile.x + tile.width):
-                        pixel = tile.image.getpixel((x - tile.x, 0))
-                        for y in range(tile.y - padding, tile.y):
-                            drawer.point((x, y), pixel)
-                    pass
+                if tile.y > padding:
+                    if args.padding_mode == PaddingMode.Black:
+                        drawer.rectangle((tile.x, tile.y - padding, tile.x + tile.width - 1, tile.y - 1), black)
+                    else:  # Fill
+                        for x in range(tile.x, tile.x + tile.width):
+                            pixel = tile.image.getpixel((x - tile.x, 0))
+                            for y in range(tile.y - padding, tile.y):
+                                drawer.point((x, y), pixel)
+                        pass
 
-            if tile.x + tile.width < w - 1:  # It's ok to draw over the canvas
-                if args.padding_mode == PaddingMode.Black:
-                    drawer.rectangle((tile.x + tile.width, tile.y,
-                                      tile.x + tile.width + padding - 1, tile.y + tile.height - 1), black)
-                else:  # Fill
-                    for y in range(tile.y, tile.y + tile.height):
-                        pixel = tile.image.getpixel((tile.width - 1, y - tile.y))
-                        for x in range(tile.x + tile.width, tile.x + tile.width + padding):
-                            drawer.point((x, y), pixel)
+                if tile.x + tile.width < w - 1:  # It's ok to draw over the canvas
+                    if args.padding_mode == PaddingMode.Black:
+                        drawer.rectangle((tile.x + tile.width, tile.y,
+                                          tile.x + tile.width + padding - 1, tile.y + tile.height - 1), black)
+                    else:  # Fill
+                        for y in range(tile.y, tile.y + tile.height):
+                            pixel = tile.image.getpixel((tile.width - 1, y - tile.y))
+                            for x in range(tile.x + tile.width, tile.x + tile.width + padding):
+                                drawer.point((x, y), pixel)
 
-            if tile.y + tile.height < h - 1:  # It's ok to draw over the canvas
-                if args.padding_mode == PaddingMode.Black:
-                    drawer.rectangle((tile.x, tile.y + tile.height,
-                                      tile.x + tile.width - 1, tile.y + tile.height + padding - 1), black)
-                else:  # Fill
-                    for x in range(tile.x, tile.x + tile.width):
-                        pixel = tile.image.getpixel((x - tile.x, tile.height - 1))
-                        for y in range(tile.y + tile.height, tile.y + tile.height + padding):
-                            drawer.point((x, y), pixel)
+                if tile.y + tile.height < h - 1:  # It's ok to draw over the canvas
+                    if args.padding_mode == PaddingMode.Black:
+                        drawer.rectangle((tile.x, tile.y + tile.height,
+                                          tile.x + tile.width - 1, tile.y + tile.height + padding - 1), black)
+                    else:  # Fill
+                        for x in range(tile.x, tile.x + tile.width):
+                            pixel = tile.image.getpixel((x - tile.x, tile.height - 1))
+                            for y in range(tile.y + tile.height, tile.y + tile.height + padding):
+                                drawer.point((x, y), pixel)
 
     print("Output: {} [{}x{}]".format(args.output, image.width, image.height))
     image.save(args.output)

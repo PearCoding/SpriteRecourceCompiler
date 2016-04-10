@@ -1,4 +1,4 @@
-# SpriteRecourceCompiler
+# SpriteResourceCompiler
 A basic resource compiler for sprites and 2D games.
 
 ##Basic usage:
