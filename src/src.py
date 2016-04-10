@@ -5,7 +5,9 @@ import math
 from modes import PackMode, PaddingMode
 from tile import Tile
 from tight_packer import TightPacker
-from filter import Filter
+
+from filter.filter import Filter
+from filter.std_filter import StandardFilter
 
 from padding.color_padding import ColorPadding
 from padding.fill_padding import FillPadding
@@ -82,45 +84,48 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Init optional filters
-    filter = None
+    filter = Filter()
     if args.filter or args.filterfile:
-        filter = Filter()
-
         for case in args.filter:
             filter.add(case)
 
         for path in args.filterfile:
             filter.parse(path)
+    else:
+        for case in StandardFilter:
+            filter.add(case)
 
-    # Read image files
+    # 1. Read image files
     tileFiles = []
     for dir in args.DIR:
         if args.recursive:
             for root, dirs, files in os.walk(dir):
                 for file in files:
-                    tileFiles.append(os.path.abspath(os.path.join(root, file)))
+                    if filter.check(os.path.basename(file)):
+                        tileFiles.append(os.path.abspath(os.path.join(root, file)))
         else:
             for file in os.listdir(dir):
-                tileFiles.append(os.path.abspath(os.path.join(dir, file)))
+                if filter.check(os.path.basename(file)):
+                    tileFiles.append(os.path.abspath(os.path.join(dir, file)))
 
+    # 2. Processor
+
+    # 3. Read computed files
     tiles = []
     for file in tileFiles:
         try:
-            if filter is None or filter.check(os.path.basename(file)):
-                tile = Tile(file)
-                tiles.append(tile)
+            tile = Tile(file)
+            tiles.append(tile)
         except IOError as e:
             print(e)
 
     tiles.sort(key=lambda p: p.area())
 
     if len(tiles) == 0:
-        if args.filter or args.filterfile:
-            print('Nothing to pack. Maybe check filters?')
-        else:
-            print('Nothing to pack.')
+        print('Nothing to pack. Maybe check filters?')
         exit(-1)
 
+    # 4. Pack files
     packer = None
     if args.packmode == PackMode.Tight:
         packer = TightPacker(args.padding)
@@ -145,7 +150,7 @@ if __name__ == "__main__":
     for tile in tiles:
         image.paste(tile.image, (tile.x, tile.y))
 
-    # Fill padding:
+    # 5. Fill padding:
     if args.padding > 0 and args.padding_mode != PaddingMode.Transparent:
         padder = None
         if args.padding_mode == PaddingMode.Black:

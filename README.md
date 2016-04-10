@@ -1,7 +1,12 @@
 # SpriteResourceCompiler
 A basic resource compiler for sprites and 2D games.
 
-##Basic usage:
-  src.py DIR [-f FILTER] -o OUTPUT
+## Basic usage:
 
-Run src.py -h for more options.
+    src DIR [-f FILTER] -o OUTPUT
+
+Run `src -h` for more options.
+
+## TODO:
+ * Large image files
+ * Cache outputs
