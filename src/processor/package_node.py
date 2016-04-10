@@ -3,6 +3,7 @@ class PackageNode:
         self.processor = processor
         self.label = label
         self.inputs = []
+        self.production = []
 
     def add(self, input):
         self.inputs.append(input)

@@ -9,6 +9,7 @@ class InputNode:
         self.filter = filter
         self.label = label
         self.outputs = []
+        self.production = []
 
     def add(self, output):
         self.outputs.append(output)

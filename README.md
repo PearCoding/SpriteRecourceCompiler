@@ -12,3 +12,4 @@ Run `src -h` for more options.
  * Cache outputs
  * Add mask node to support masking
  * Add threading to improve performance
+ * Add 'from' attribute to output node to allow better caching and performance
