@@ -1,12 +1,14 @@
-# SpriteResourceCompiler
+# Sprite Resource Compiler
 A basic resource compiler for sprites and 2D games.
 
-## Basic usage:
+## Basic Usage
 
     src DIR [-f FILTER] -o OUTPUT
 
 Run `src -h` for more options.
 
-## TODO:
+## TODO
  * Large image files
  * Cache outputs
+ * Add mask node to support masking
+ * Add threading to improve performance

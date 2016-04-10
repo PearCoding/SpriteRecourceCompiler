@@ -12,7 +12,7 @@ from filter.std_filter import StandardFilter
 from padding.color_padding import ColorPadding
 from padding.fill_padding import FillPadding
 
-from PIL import Image
+from PIL import Image, PILLOW_VERSION
 
 APP_NAME = "SpriteResourceCompiler (SRC)"
 APP_VERSION = "0.1"
@@ -79,7 +79,8 @@ if __name__ == "__main__":
                         help='make the output image size power of 2')
     parser.add_argument('-sqr', '--square', dest='square', action='store_true',
                         help='make the output image size square')
-    parser.add_argument('--version', action='version', version='{} {}'.format(APP_NAME, APP_VERSION))
+    parser.add_argument('--version', action='version', version='{} {} with PILLOW {}'.format(
+                            APP_NAME, APP_VERSION, PILLOW_VERSION))
 
     args = parser.parse_args()
 
