@@ -4,7 +4,8 @@ from PIL import Image
 
 
 class InputNode:
-    def __init__(self, filter, label=None):
+    def __init__(self, package_node, filter, label=None):
+        self.package_node = package_node
         self.filter = filter
         self.label = label
         self.outputs = []

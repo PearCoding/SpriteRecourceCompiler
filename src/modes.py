@@ -1,4 +1,5 @@
 from enum import Enum, unique
+from PIL import Image
 
 
 @unique
@@ -43,3 +44,23 @@ class InputTypeMode(Enum):
 
     def __str__(self):
         return '{0}'.format(self.name)
+
+
+@unique
+class ResamplingMode(Enum):
+    Nearest = 0
+    Bilinear = 1
+    Bicubic = 2
+
+    def __str__(self):
+        return '{0}'.format(self.name)
+
+    def toPIL(self):
+        if self == ResamplingMode.Nearest:
+            return Image.NEAREST
+        elif self == ResamplingMode.Bilinear:
+            return Image.BILINEAR
+        elif self == ResamplingMode.Bicubic:
+            return Image.BICUBIC
+        else:
+            raise RuntimeError()
