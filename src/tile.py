@@ -2,9 +2,6 @@ import os
 from PIL import Image
 from enum import Enum, unique
 
-from modes import PackMode
-
-
 @unique
 class TileType(Enum):
     Unknown = 0
@@ -21,12 +18,14 @@ class Tile:
 
     def __init__(self, file, mode):
         self.image = Image.open(file)
+        self.width = self.image.width
+        self.height = self.image.height
 
     def area(self):
-        return self.image.width * self.image.height
+        return self.width * self.height
 
     def size(self):
-        return self.image.width, self.image.height
+        return self.width, self.height
 
     def __repr__(self):
-        return 'Tile[' + str(self.image.width) + ',' + str(self.image.height) + ']'
+        return 'Tile[' + str(self.width) + ',' + str(self.height) + ']'

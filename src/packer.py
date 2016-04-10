@@ -1,5 +1,5 @@
 class Packer:
-    def pack(self, tiles, padding):
+    def pack(self, tiles):
         raise NotImplementedError('Has to be implemented')
 
     def size(self):

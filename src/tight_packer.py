@@ -18,22 +18,38 @@ class FreeRect:
         tw, th = tile.size()
         return (tw <= self.w) and (th <= self.h)
 
+    def area(self):
+        return self.w * self.h
+
 
 class TightPacker(Packer):
-    def __init__(self):
+    def __init__(self, padding):
+        self.padding = padding
         self.w, self.h = 0, 0
         self.freeRects = []
 
-    def enlargeArea(self, tile):
-        pass#TODO: Add this!
+    def sort_free_rects(self):
+        self.freeRects = sorted(self.freeRects, key=lambda rect: rect.area())
 
-    def findArea(self, tile):
+    def enlarge_area(self, tile):
+        self.freeRects.append(FreeRect(self.w+self.padding*2, 0,
+                                       tile.width, self.h))
+        self.freeRects.append(FreeRect(0, self.h+self.padding*2,
+                                       self.w, tile.width))
+        self.freeRects.append(FreeRect(self.w+self.padding*2, self.h + self.padding*2,
+                                       tile.width, tile.height))
+        self.sort_free_rects()
+
+        self.w += tile.width + self.padding*2
+        self.h += tile.height + self.padding*2
+
+    def find_area(self, tile):
         for area in self.freeRects:
             if area.fit(tile):
                 return area
         return None
 
-    def pack(self, tiles, padding):
+    def pack(self, tiles):
         queue = deque(tiles)
 
         first = queue.popleft()
@@ -44,10 +60,11 @@ class TightPacker(Packer):
 
         while len(queue) > 0:
             tile = queue.popleft()
-            area = self.findArea(tile)
+            area = self.find_area(tile)
             if area is None:
-                self.enlargeArea(tile)
-                area = self.findArea(tile)
+                #TODO: First try to merge some free rects together!
+                self.enlarge_area(tile)
+                area = self.find_area(tile)
 
             tile.x = area.x
             tile.y = area.y
