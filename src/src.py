@@ -1,18 +1,16 @@
 import argparse
-import os
 import math
+import os
 
-from modes import PackMode, PaddingMode
-from tile import Tile
-from tight_packer import TightPacker
+from PIL import Image, PILLOW_VERSION
 
 from filter.filter import Filter
 from filter.std_filter import StandardFilter
-
+from modes import PackMode, PaddingMode
+from packer.tight_packer import TightPacker
 from padding.color_padding import ColorPadding
 from padding.fill_padding import FillPadding
-
-from PIL import Image, PILLOW_VERSION
+from tile import Tile
 
 APP_NAME = "SpriteResourceCompiler (SRC)"
 APP_VERSION = "0.1"
@@ -20,17 +18,17 @@ APP_VERSION = "0.1"
 
 def readable_dir(string):
     if not os.path.isdir(string):
-        raise argparse.ArgumentTypeError("ReadableDir:{0} is not a valid path".format(string))
+        raise argparse.ArgumentTypeError("{0} is not a valid path".format(string))
     if os.access(string, os.R_OK):
         return string
     else:
-        raise argparse.ArgumentTypeError("ReadableDir:{0} is not a readable dir".format(string))
+        raise argparse.ArgumentTypeError("{0} is not a readable dir".format(string))
 
 
 # TODO: Should check if it's possible to write, etc.
 def get_file_name(string):
     if os.path.isdir(string):
-        raise argparse.ArgumentTypeError("Output:{0} is not a valid path".format(string))
+        raise argparse.ArgumentTypeError("{0} is not a valid path".format(string))
     else:
         return string
 
@@ -38,8 +36,10 @@ def get_file_name(string):
 def get_pack_mode(string):
     if string.lower() == 'tight':
         return PackMode.Tight
-    else:
+    elif string.lower() == 'varanim':
         return PackMode.VarAnim
+    else:
+        raise argparse.ArgumentTypeError("{0} is not a valid mode".format(string))
 
 
 def get_padding_mode(string):
@@ -51,8 +51,10 @@ def get_padding_mode(string):
         return PaddingMode.White
     elif string.lower() == 'magenta':
         return PaddingMode.Magenta
-    else:
+    elif string.lower() == 'fill':
         return PaddingMode.Fill
+    else:
+        raise argparse.ArgumentTypeError("{0} is not a valid mode".format(string))
 
 
 if __name__ == "__main__":
@@ -79,6 +81,8 @@ if __name__ == "__main__":
                         help='make the output image size power of 2')
     parser.add_argument('-sqr', '--square', dest='square', action='store_true',
                         help='make the output image size square')
+    parser.add_argument('--debug', dest='debug', action='store_true',
+                        help='draw debug information as well (DEBUG)')
     parser.add_argument('--version', action='version', version='{} {} with PILLOW {}'.format(
                             APP_NAME, APP_VERSION, PILLOW_VERSION))
 
@@ -120,7 +124,7 @@ if __name__ == "__main__":
         except IOError as e:
             print(e)
 
-    tiles.sort(key=lambda p: p.area())
+    tiles.sort(key=lambda p: p.area(), reverse=True)
 
     if len(tiles) == 0:
         print('Nothing to pack. Maybe check filters?')
@@ -134,7 +138,19 @@ if __name__ == "__main__":
     elif args.packmode == PackMode.VarAnim:
         raise NotImplementedError()
 
-    w, h = packer.size()
+    # Get sizes
+    w = 0
+    h = 0
+
+    for tile in tiles:
+        if w < tile.x + tile.width + args.padding*2:
+            w = tile.x + tile.width + args.padding*2
+        if h < tile.y + tile.height + args.padding*2:
+            h = tile.y + tile.height + args.padding*2
+
+    w -= args.padding*2
+    h -= args.padding*2
+    print(w, h)
 
     # Setup sizes
     if args.pow:
@@ -146,7 +162,15 @@ if __name__ == "__main__":
         h = w
 
     # Draw image:
-    image = Image.new("RGBA", (w, h))
+    def_color = 0
+    if args.padding_mode == PaddingMode.Black:
+        def_color = (0, 0, 0, 255)
+    elif args.padding_mode == PaddingMode.White:
+        def_color = (255, 255, 255, 255)
+    elif args.padding_mode == PaddingMode.Magenta:
+        def_color = (255, 0, 255, 255)
+
+    image = Image.new("RGBA", (w, h), def_color)
 
     for tile in tiles:
         image.paste(tile.image, (tile.x, tile.y))
@@ -154,16 +178,17 @@ if __name__ == "__main__":
     # 5. Fill padding:
     if args.padding > 0 and args.padding_mode != PaddingMode.Transparent:
         padder = None
-        if args.padding_mode == PaddingMode.Black:
-            padder = ColorPadding()
-        elif args.padding_mode == PaddingMode.White:
-            padder = ColorPadding((255, 255, 255, 255))
-        elif args.padding_mode == PaddingMode.Magenta:
-            padder = ColorPadding((255, 0, 255, 255))
-        elif args.padding_mode == PaddingMode.Fill:
+        # if args.padding_mode == PaddingMode.Black:
+        #    padder = ColorPadding()
+        # elif args.padding_mode == PaddingMode.White:
+        #    padder = ColorPadding((255, 255, 255, 255))
+        # elif args.padding_mode == PaddingMode.Magenta:
+        #    padder = ColorPadding((255, 0, 255, 255))
+        if args.padding_mode == PaddingMode.Fill:
             padder = FillPadding()
 
-        padder.fill(image, tiles, args.padding)
+        if padder:
+            padder.fill(image, tiles, args.padding)
 
     print("Output: {} [{}x{}]".format(args.output, image.width, image.height))
     image.save(args.output)
