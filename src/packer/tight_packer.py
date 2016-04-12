@@ -6,7 +6,6 @@ class TightPacker(Packer):
     def __init__(self, padding):
         self.padding = padding
         self.padding2 = padding*2
-        self.free_rects = []
         self.w = 0
         self.h = 0
         self.free_flag = False  # x direction
@@ -14,11 +13,11 @@ class TightPacker(Packer):
     def pack(self, tiles):
         queue = deque(tiles)
 
-        first = queue.popleft()
-        first.x = 0
-        first.y = 0
+        tile = queue.popleft()
+        tile.x = 0
+        tile.y = 0
 
-        self.w, self.h = first.size()
+        self.w, self.h = tile.size()
 
         while len(queue) > 0:
             tile = queue.popleft()
@@ -45,12 +44,16 @@ class TightPacker(Packer):
             # If nothing found, enlarge area
             if found_x < 0 or found_y < 0:
                 if self.free_flag:  # y direction
+                    found_x = 0
+                    found_y = self.h + self.padding2
                     self.h += tile.height + self.padding2
                 else:
+                    found_x = self.w + self.padding2
+                    found_y = 0
                     self.w += tile.width + self.padding2
                 self.free_flag = not self.free_flag
 
-            found_x, found_y = self.get_free_area(tiles, tile)
+            # found_x, found_y = self.get_free_area(tiles, tile)
 
             if found_x < 0 or found_y < 0:
                 raise RuntimeError('Enlarging packing area failed. Software is bugged.')
@@ -68,24 +71,25 @@ class TightPacker(Packer):
         return None
 
     def get_free_area(self, tiles, tile):
-        for y in range(0, self.h):
+        for y in range(0, self.h - tile.height - self.padding2):
             x = 0
-            while x < self.w:
+            while x < self.w - tile.width - self.padding2:
                 tmp = self.get_tile_at(tiles, (x, y))
                 if tmp:
                     x = tmp.x + tmp.width + self.padding2
                 else:
-                    not_found = True
+                    found = False
                     for y2 in range(y, y + tile.height + self.padding2):
                         for x2 in range(x, x + tile.width + self.padding2):
                             if self.get_tile_at(tiles, (x2, y2)):
-                                not_found = False
-                                x += 1
+                                found = True
                                 break
-                        if not not_found:
+                        if found:
                             break
-                    if not_found:
+                    if not found:
                         return x, y
+                    else:
+                        x += 1
         return -1, -1
 
     # Vertical
