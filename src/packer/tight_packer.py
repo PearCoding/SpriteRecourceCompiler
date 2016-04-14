@@ -1,5 +1,6 @@
 from packer.packer import Packer
 from collections import deque
+import sys
 
 
 class TightPacker(Packer):
@@ -30,16 +31,16 @@ class TightPacker(Packer):
                 found_x2, found_y2, width2, height2 = self.get_free_horz_edge_area(tiles, tile)
 
                 vert = True
-                if width2*height2 > width*height:
+                if found_x2 >= 0 and found_y2 >= 0 and width2*height2 > width*height:
                     found_x, found_y = found_x2, found_y2
                     width, height = width2, height2
                     vert = False
 
-                if found_x >= 0 or found_y >= 0 or width*height > 0:
+                if found_x >= 0 and found_y >= 0 and width*height > 0:
                     if vert:
-                        self.w += tile.width + self.padding2 - width
+                        self.w += tile.width - width
                     else:
-                        self.h += tile.height + self.padding2 - height
+                        self.h += tile.height - height
 
             # If nothing found, enlarge area
             if found_x < 0 or found_y < 0:
@@ -99,29 +100,24 @@ class TightPacker(Packer):
         found_x = -1
         found_y = -1
 
-        paddD = 0
         for y in range(0, self.h):
-            if not self.get_tile_at(tiles, (self.w - 1, y)):
-                paddD += 1
-                if paddD > self.padding2:
-                    x2, y2, width2, height2 = self.check_vert_tile_fit(y, tiles, tile)
-                    if width2*height2 > width*height:
-                        found_x = x2
-                        found_y = y2
-                        width, height = width2, height2
-                else:
-                    paddD = 0
+            found = self.get_tile_at(tiles, (self.w - 1, y))
+            if not found:
+                found_x, found_y, width, height = self.check_vert_tile_fit(y, tiles, tile)
+                if found_x >= 0 and found_y >= 0 and width*height > 0:
+                    break
+            else:
+                y += found.height + self.padding2
 
         return found_x, found_y, width, height
 
     def check_vert_tile_fit(self, y, tiles, tile):
         height = 0
-        min_width = 0
+        min_width = sys.maxsize
         found_x = -1
         found_y = y
-        for y2 in range(y, y + tile.height + self.padding2):
-            if height >= tile.height + self.padding2 or \
-                            y2 >= self.h or \
+        for y2 in range(y, y + tile.height + self.padding2 + 1):
+            if y2 >= self.h or \
                     self.get_tile_at(tiles, (self.w - 1, y2)):
                 break
             else:
@@ -141,7 +137,7 @@ class TightPacker(Packer):
 
                 height += 1
 
-        if height >= tile.height + self.padding2:
+        if found_x >= 0 and height >= tile.height + self.padding2:
             return found_x, found_y, min_width, height
         else:
             return -1, -1, 0, 0
@@ -153,29 +149,24 @@ class TightPacker(Packer):
         found_x = -1
         found_y = -1
 
-        paddD = 0
         for x in range(0, self.w):
-            if not self.get_tile_at(tiles, (x, self.h - 1)):
-                paddD += 1
-                if paddD > self.padding2:
-                    x2, y2, width2, height2 = self.check_horz_tile_fit(x, tiles, tile)
-                    if width2*height2 > width*height:
-                        found_x = x2
-                        found_y = y2
-                        width, height = width2, height2
-                else:
-                    paddD = 0
+            found = self.get_tile_at(tiles, (x, self.h - 1))
+            if not found:
+                found_x, found_y, width, height = self.check_horz_tile_fit(x, tiles, tile)
+                if found_x >= 0 and found_y >= 0 and width * height > 0:
+                    break
+            else:
+                x += found.width + self.padding2
 
         return found_x, found_y, width, height
 
     def check_horz_tile_fit(self, x, tiles, tile):
-        min_height = 0
+        min_height = sys.maxsize
         width = 0
         found_x = x
         found_y = -1
-        for x2 in range(x, x + tile.width + self.padding2):
-            if min_height >= tile.width + self.padding2 or \
-                            x2 >= self.w or \
+        for x2 in range(x, x + tile.width + self.padding2 + 1):
+            if x2 >= self.w or \
                     self.get_tile_at(tiles, (x2, self.h - 1)):
                 break
             else:
@@ -195,7 +186,7 @@ class TightPacker(Packer):
 
                 width += 1
 
-        if width >= tile.width + self.padding2:
-            return found_x, found_y, width , min_height
+        if found_y >= 0 and width >= tile.width + self.padding2:
+            return found_x, found_y, width, min_height
         else:
             return -1, -1, 0, 0

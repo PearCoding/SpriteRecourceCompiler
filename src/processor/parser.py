@@ -10,15 +10,8 @@ from processor.nodes.rotate_node import RotateNode
 from processor.nodes.scale_node import ScaleNode
 from processor.nodes.tint_node import TintNode
 
+from exceptions import *
 from modes import *
-
-
-class XMLError(Exception):
-    def __init__(self, str):
-        self.str = str
-
-    def __str__(self):
-        return 'XML Error: {}'.format(self.str)
 
 
 class Parser:

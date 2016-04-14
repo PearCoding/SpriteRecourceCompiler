@@ -4,8 +4,7 @@ from PIL import Image
 
 @unique
 class PackMode(Enum):
-    VarAnim = 0  # FIXME: Not implemented!
-    Tight = 1
+    Tight = 0
 
     def __str__(self):
         return '{0}'.format(self.name)

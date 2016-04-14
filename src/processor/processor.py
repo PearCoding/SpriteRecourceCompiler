@@ -1,9 +1,4 @@
-class ProcessorError(Exception):
-    def __init__(self, str):
-        self.str = str
-
-    def __str__(self):
-        return 'Processing Error: {}'.format(self.str)
+from exceptions import *
 
 
 class Processor:

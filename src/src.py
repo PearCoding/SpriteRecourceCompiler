@@ -15,8 +15,12 @@ from tile import Tile
 from processor.processor import Processor
 from processor.parser import Parser
 
+from csv_writer import CSVWriter
+
 APP_NAME = "SpriteResourceCompiler (SRC)"
-APP_VERSION = "0.1"
+
+SRC_VERSION = [0, 1]
+SRC_VERSION_STR = '{}.{}'.format(SRC_VERSION[0], SRC_VERSION[1])
 
 
 def readable_dir(string):
@@ -39,8 +43,6 @@ def get_file_name(string):
 def get_pack_mode(string):
     if string.lower() == 'tight':
         return PackMode.Tight
-    elif string.lower() == 'varanim':
-        return PackMode.VarAnim
     else:
         raise argparse.ArgumentTypeError("{0} is not a valid mode".format(string))
 
@@ -66,6 +68,8 @@ if __name__ == "__main__":
                         help='the used directory to search for images')
     parser.add_argument('-o', '--output', dest='output', type=get_file_name, required=True,
                         help='the output file')
+    parser.add_argument('-l', '--list', dest='csv', type=get_file_name,
+                        help='optional csv file with the positions of every sprite')
     parser.add_argument('-r', '--recursive', dest='recursive', action='store_true',
                         help='search directories and subdirectories recursively')
     parser.add_argument('-f', '--filter', dest='filter', nargs='*',
@@ -89,7 +93,7 @@ if __name__ == "__main__":
     parser.add_argument('--debug', dest='debug', action='store_true',
                         help='draw debug information as well (DEBUG)')
     parser.add_argument('--version', action='version', version='{} {} with PILLOW {}'.format(
-                            APP_NAME, APP_VERSION, PILLOW_VERSION))
+                            APP_NAME, SRC_VERSION_STR, PILLOW_VERSION))
 
     args = parser.parse_args()
 
@@ -204,3 +208,6 @@ if __name__ == "__main__":
 
     print("Output: {} [{}x{}]".format(args.output, image.width, image.height))
     image.save(args.output)
+
+    if args.csv:
+        CSVWriter.write(args.csv, tiles)
