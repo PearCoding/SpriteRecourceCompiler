@@ -58,45 +58,35 @@ class Processor:
             for node in output.nodes:
                 output.dependencies.update(node.dependencies(self))
 
-        # Check for cyclic dependencies.
-        for output in self.outputs:
-            if Processor.is_cyclic(output, []):
-                raise ProcessorError('Cyclic dependency in processing graph found.')
-
-    @staticmethod
-    def is_cyclic(output, stack):
-        for dependency in output.dependencies:
-            if dependency in stack:
-                return True
-
-            stack.append(dependency)
-            if not Processor.is_cyclic(dependency, stack):
-                return True
-        return False
-
     def exec_rec(self, output, imgs, stack):
-        if output.from_node:
-            res = []
-            for dependency in output.from_dependencies:
-                if dependency in stack:
-                    res.extend(dependency.production)
-                else:
-                    stack.append(dependency)
-                    res.extend(Processor.exec_rec(dependency, imgs, stack))
-            return output.exec(self, res)
+        if output in stack:
+            raise ProcessorError('Cyclic dependency in processing graph found.')
+
+        if output.production:
+            return output.production
         else:
-            return output.exec(self, imgs)
+            stack.append(output)
+            if output.from_node:
+                res = []
+                for dependency in output.from_dependencies:
+                    res.extend(self.exec_rec(dependency, imgs, stack))
+                ret = output.exec(self, res)
+            else:
+                ret = output.exec(self, imgs)
+            stack.pop()
+            return ret
 
     def exec(self, imgs):
         self.files = imgs
         self.setup_dependencies()
 
-        res = []
         stack = []
         for output in self.outputs:
-            if output in stack:
-                stack.append(output)
+            self.exec_rec(output, imgs, stack)
+
+        res = []
+        for output in self.outputs:
+            if not output.suppress:
                 res.extend(output.production)
-            else:
-                res.extend(self.exec_rec(output, imgs, stack))
+
         return res

@@ -32,10 +32,10 @@ class Parser:
 
         for input in self.root.getElementsByTagName('input'):
             if not input.hasAttribute('filter') and not input.hasAttribute('from'):
-                raise XMLError('input node has no required filter or from attribute.')
+                raise XMLError('input node has no required "filter" or "from" attribute.')
 
             if input.hasAttribute('filter') and input.hasAttribute('from'):
-                raise XMLError('input node has both filter and from attribute, but only one is allowed.')
+                raise XMLError('input node has both "filter" and "from" attribute, but only one is allowed.')
 
             for output in input.getElementsByTagName('output'):
                 output_node = OutputNode(input_filter=input.getAttribute('filter'),
@@ -46,8 +46,7 @@ class Parser:
                                          input.getAttribute('label') if input.hasAttribute('label') else None,
                                          package_label=
                                          self.root.getAttribute('label') if self.root.hasAttribute('label') else None,
-                                         suppress=
-                                         input.getAttribute('suppress') if input.hasAttribute('suppress') else None)
+                                         suppress=Parser.parse_boolean(output.getAttribute('suppress')))
 
                 nodes = output.childNodes
 
@@ -93,6 +92,13 @@ class Parser:
                         raise XMLError("Unknown processing node '{}'".format(node.tagName))
 
                 processor.add(output_node)
+
+    @staticmethod
+    def parse_boolean(str):
+        if str == '1' or str.lower() == 'true' or str.lower() == 'on':
+            return True
+        else:
+            return False
 
     @staticmethod
     def parse_color(str):
@@ -159,6 +165,8 @@ class Parser:
     def parse_scale_mode(str):
         if (not str) or str.lower() == 'extend':
             return AddScaleMode.Extend
+        elif str.lower() == 'min':
+            return AddScaleMode.Min
         elif str.lower() == 'clamp':
             return AddScaleMode.Clamp
         else:

@@ -14,7 +14,7 @@ class OutputNode:
         self.nodes = []
 
         # Processing tmps
-        self.production = []
+        self.production = None
         self.dependencies = set()  # General ones
         self.from_dependencies = set()
 
@@ -28,7 +28,7 @@ class OutputNode:
                 if self.from_node:
                     tmp = [img]
                 else:
-                    tmp = [Image.open(img)]
+                    tmp = [Image.open(img).convert("RGBA")]
                 for node in self.nodes:
                     new_tmp = []
                     for o in tmp:

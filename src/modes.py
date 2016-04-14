@@ -47,7 +47,8 @@ class InputTypeMode(Enum):
 @unique
 class AddScaleMode(Enum):
     Extend = 0
-    Clamp = 1
+    Min = 1
+    Clamp = 2
 
     def __str__(self):
         return '{0}'.format(self.name)
