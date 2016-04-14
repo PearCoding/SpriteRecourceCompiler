@@ -51,11 +51,11 @@ class AddNode(ProcessingNode):
                         color_img = img_a[x, y] if y < img.height and x < img.width else (0, 0, 0, 0)
                         color_oth = other_a[x, y] if y < other.height and x < other.width else (0, 0, 0, 0)
 
-                        opacity = self.opacity * color_oth[A]/255
+                        opacity = self.opacity * (color_oth[A]/255)
                         r = color_img[R] * (1-opacity)
                         g = color_img[G] * (1-opacity)
                         b = color_img[B] * (1-opacity)
-                        a = color_img[A] * (1-self.opacity) + color_oth[A] * self.opacity
+                        a = color_img[A]
 
                         if self.mode == ImageFilterMode.Multiply:
                             r += (color_oth[R] / 255) * color_img[R] * opacity
