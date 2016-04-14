@@ -1,9 +1,9 @@
 # Sprite Resource Compiler
 A basic resource compiler for sprites and 2D games.
 
-## Basic Usage
+## Basic Example
 
-    src DIR [-f FILTER] -o OUTPUT
+    src ./sprites -f "*.png" -o package.png
 
 Run `src -h` for more options.
 

@@ -12,6 +12,9 @@ from padding.color_padding import ColorPadding
 from padding.fill_padding import FillPadding
 from tile import Tile
 
+from processor.processor import Processor
+from processor.parser import Parser
+
 APP_NAME = "SpriteResourceCompiler (SRC)"
 APP_VERSION = "0.1"
 
@@ -69,6 +72,8 @@ if __name__ == "__main__":
                         help='add a filter for filenames (wildcard)')
     parser.add_argument('-ff', '--filter-file', dest='filterfile', nargs='*',
                         help='add a filter file containing filters for filenames (wildcard)')
+    parser.add_argument('-x', dest='processorfile', nargs='*',
+                        help='add a processor xml file containing rules to process given sprites')
     parser.add_argument('-m', '--mode', dest='packmode', type=get_pack_mode,
                         choices=list(PackMode), default=PackMode.Tight,
                         help='the packing mode to use while generating the output')
@@ -115,14 +120,21 @@ if __name__ == "__main__":
 
     # 2. Processor
 
-    # 3. Read computed files
     tiles = []
-    for file in tileFiles:
-        try:
-            tile = Tile(file)
-            tiles.append(tile)
-        except IOError as e:
-            print(e)
+    if args.processorfile and len(args.processorfile) > 0:
+        processor = Processor()
+        for file in args.processorfile:
+            parser = Parser(file)
+            parser.parse(processor)
+        for output in processor.exec(tileFiles):
+            tiles.append(Tile(output, True))
+    else:
+        for file in tileFiles:
+            try:
+                tile = Tile(file)
+                tiles.append(tile)
+            except IOError as e:
+                print(e)
 
     tiles.sort(key=lambda p: p.area(), reverse=True)
 
@@ -138,7 +150,7 @@ if __name__ == "__main__":
     elif args.packmode == PackMode.VarAnim:
         raise NotImplementedError()
 
-    # Get sizes
+    # Get sizes (Better recalculate it)
     w = 0
     h = 0
 

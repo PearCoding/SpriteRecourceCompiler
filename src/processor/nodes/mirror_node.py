@@ -7,13 +7,8 @@ class MirrorNode(ProcessingNode):
         self.horz = horz
         self.vert = vert
 
-    def exec(self, imgs):
-        res = []
-        for img in imgs:
-            tmp = img
-            if self.horz:
-                tmp = tmp.transpose(Image.FLIP_TOP_BOTTOM)
-            if self.vert:
-                tmp = tmp.transpose(Image.FLIP_LEFT_RIGHT)
-            res.append(tmp)
-        return res
+    def exec(self, img):
+        if self.horz:
+            return [img.transpose(Image.FLIP_TOP_BOTTOM)]
+        if self.vert:
+            return [img.transpose(Image.FLIP_LEFT_RIGHT)]

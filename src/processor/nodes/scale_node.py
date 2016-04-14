@@ -7,8 +7,5 @@ class ScaleNode(ProcessingNode):
         self.y_scale = y_scale
         self.quality = quality
 
-    def exec(self, imgs):
-        res = []
-        for img in imgs:
-            res.append(img.resize((img.width*self.x_scale, img.height*self.y_scale), self.quality.toPIL()))
-        return res
+    def exec(self, img):
+        return [img.resize((int(img.width*self.x_scale), int(img.height*self.y_scale)), self.quality.toPIL())]
