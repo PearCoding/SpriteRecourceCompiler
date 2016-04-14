@@ -1,3 +1,6 @@
 class ProcessingNode:
-    def exec(self, img):
+    def exec(self, processor, img):
         raise NotImplementedError()
+
+    def dependencies(self, processor):
+        return []

@@ -38,9 +38,16 @@ class ImageFilterMode(Enum):
 @unique
 class InputTypeMode(Enum):
     File = 0
-    Output = 1
-    Input = 2
-    Package = 3
+    Node = 1
+
+    def __str__(self):
+        return '{0}'.format(self.name)
+
+
+@unique
+class AddScaleMode(Enum):
+    Extend = 0
+    Clamp = 1
 
     def __str__(self):
         return '{0}'.format(self.name)

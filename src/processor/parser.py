@@ -31,17 +31,17 @@ class Parser:
             raise XMLError("No root 'package' element found.")
 
         for input in self.root.getElementsByTagName('input'):
-            if not input.hasAttribute('filter'):
-                raise XMLError('input node has no required filter attribute.')
+            if not input.hasAttribute('filter') and not input.hasAttribute('from'):
+                raise XMLError('input node has no required filter or from attribute.')
 
-            input.getAttribute('filter'),
+            if input.hasAttribute('filter') and input.hasAttribute('from'):
+                raise XMLError('input node has both filter and from attribute, but only one is allowed.')
 
             for output in input.getElementsByTagName('output'):
-                # from_attr = output.getAttribute('from')
-
                 output_node = OutputNode(input_filter=input.getAttribute('filter'),
+                                         from_node=input.getAttribute('from'),
                                          label=
-                                         input.getAttribute('label') if input.hasAttribute('label') else None,
+                                         output.getAttribute('label') if output.hasAttribute('label') else None,
                                          input_label=
                                          input.getAttribute('label') if input.hasAttribute('label') else None,
                                          package_label=
@@ -82,7 +82,13 @@ class Parser:
                             max(0, float(node.getAttribute('strength'))) if node.hasAttribute('strength') else 1)
                         output_node.add(node_node)
                     elif node.tagName == 'add':
-                        raise NotImplementedError()
+                        node_node = AddNode(node.getAttribute('input'),
+                                            Parser.parse_input_type(node.getAttribute('input_type')),
+                                            Parser.parse_filter_mode(node.getAttribute('mode')),
+                                            max(0, min(1, float(node.getAttribute('opacity')))) if
+                                            node.hasAttribute('opacity') else 1,
+                                            Parser.parse_scale_mode(node.getAttribute('scale')))
+                        output_node.add(node_node)
                     else:
                         raise XMLError("Unknown processing node '{}'".format(node.tagName))
 
@@ -139,3 +145,21 @@ class Parser:
             return v[0], v[1]
         else:
             raise XMLError('Factor attribute is not valid.')
+
+    @staticmethod
+    def parse_input_type(str):
+        if (not str) or str.lower() == 'file':
+            return InputTypeMode.File
+        elif str.lower() == 'node':
+            return InputTypeMode.Node
+        else:
+            raise XMLError('input_type attribute is not valid.')
+
+    @staticmethod
+    def parse_scale_mode(str):
+        if (not str) or str.lower() == 'extend':
+            return AddScaleMode.Extend
+        elif str.lower() == 'clamp':
+            return AddScaleMode.Clamp
+        else:
+            raise XMLError('scale attribute for "add" node is not valid.')
