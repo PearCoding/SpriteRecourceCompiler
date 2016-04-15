@@ -3,24 +3,9 @@ import math
 import os
 
 from PIL import Image, PILLOW_VERSION
-
-from filter.filter import Filter
-from filter.std_filter import StandardFilter
-from modes import PackMode, PaddingMode
-from packer.tight_packer import TightPacker
-from padding.color_padding import ColorPadding
-from padding.fill_padding import FillPadding
-from tile import Tile
-
-from processor.processor import Processor
-from processor.parser import Parser
-
-from csv_writer import CSVWriter
+import src
 
 APP_NAME = "SpriteResourceCompiler (SRC)"
-
-SRC_VERSION = [0, 1]
-SRC_VERSION_STR = '{}.{}'.format(SRC_VERSION[0], SRC_VERSION[1])
 
 
 def readable_dir(string):
@@ -42,22 +27,22 @@ def get_file_name(string):
 
 def get_pack_mode(string):
     if string.lower() == 'tight':
-        return PackMode.Tight
+        return src.PackMode.Tight
     else:
         raise argparse.ArgumentTypeError("{0} is not a valid mode".format(string))
 
 
 def get_padding_mode(string):
     if string.lower() == 'transparent':
-        return PaddingMode.Transparent
+        return src.PaddingMode.Transparent
     elif string.lower() == 'black':
-        return PaddingMode.Black
+        return src.PaddingMode.Black
     elif string.lower() == 'white':
-        return PaddingMode.White
+        return src.PaddingMode.White
     elif string.lower() == 'magenta':
-        return PaddingMode.Magenta
+        return src.PaddingMode.Magenta
     elif string.lower() == 'fill':
-        return PaddingMode.Fill
+        return src.PaddingMode.Fill
     else:
         raise argparse.ArgumentTypeError("{0} is not a valid mode".format(string))
 
@@ -79,12 +64,12 @@ if __name__ == "__main__":
     parser.add_argument('-x', dest='processorfile', nargs='*',
                         help='add a processor xml file containing rules to process given sprites')
     parser.add_argument('-m', '--mode', dest='packmode', type=get_pack_mode,
-                        choices=list(PackMode), default=PackMode.Tight,
+                        choices=list(src.PackMode), default=src.PackMode.Tight,
                         help='the packing mode to use while generating the output')
     parser.add_argument('-p', '--padding', dest='padding', type=int, default=1,
                         help='the padding in pixel between each tile')
-    parser.add_argument('-pm', '--padding_mode', dest='padding_mode', type=get_padding_mode, default=PaddingMode.Fill,
-                        choices=list(PaddingMode),
+    parser.add_argument('-pm', '--padding_mode', dest='padding_mode', type=get_padding_mode, default=src.PaddingMode.Fill,
+                        choices=list(src.PaddingMode),
                         help='the used algorithm to fill the empty padding gap between each tile')
     parser.add_argument('-p2', '--pow2', dest='pow', action='store_true',
                         help='make the output image size power of 2')
@@ -93,12 +78,12 @@ if __name__ == "__main__":
     parser.add_argument('--debug', dest='debug', action='store_true',
                         help='draw debug information as well (DEBUG)')
     parser.add_argument('--version', action='version', version='{} {} with PILLOW {}'.format(
-                            APP_NAME, SRC_VERSION_STR, PILLOW_VERSION))
+                            APP_NAME, src.VERSION_STR, PILLOW_VERSION))
 
     args = parser.parse_args()
 
     # Init optional filters
-    filter = Filter()
+    filter = src.Filter()
     if args.filter or args.filterfile:
         for case in args.filter:
             filter.add(case)
@@ -106,7 +91,7 @@ if __name__ == "__main__":
         for path in args.filterfile:
             filter.parse(path)
     else:
-        for case in StandardFilter:
+        for case in src.StandardFilter:
             filter.add(case)
 
     # 1. Read image files
@@ -126,16 +111,16 @@ if __name__ == "__main__":
 
     tiles = []
     if args.processorfile and len(args.processorfile) > 0:
-        processor = Processor()
+        processor = src.Processor()
         for file in args.processorfile:
-            parser = Parser(file)
+            parser = src.Parser(file)
             parser.parse(processor)
         for output in processor.exec(tileFiles):
-            tiles.append(Tile(output, True))
+            tiles.append(src.Tile(output, True))
     else:
         for file in tileFiles:
             try:
-                tile = Tile(file)
+                tile = src.Tile(file)
                 tiles.append(tile)
             except IOError as e:
                 print(e)
@@ -148,10 +133,10 @@ if __name__ == "__main__":
 
     # 4. Pack files
     packer = None
-    if args.packmode == PackMode.Tight:
-        packer = TightPacker(args.padding)
+    if args.packmode == src.PackMode.Tight:
+        packer = src.TightPacker(args.padding)
         packer.pack(tiles)
-    elif args.packmode == PackMode.VarAnim:
+    elif args.packmode == src.PackMode.VarAnim:
         raise NotImplementedError()
 
     # Get sizes (Better recalculate it)
@@ -179,11 +164,11 @@ if __name__ == "__main__":
 
     # Draw image:
     def_color = 0
-    if args.padding_mode == PaddingMode.Black:
+    if args.padding_mode == src.PaddingMode.Black:
         def_color = (0, 0, 0, 255)
-    elif args.padding_mode == PaddingMode.White:
+    elif args.padding_mode == src.PaddingMode.White:
         def_color = (255, 255, 255, 255)
-    elif args.padding_mode == PaddingMode.Magenta:
+    elif args.padding_mode == src.PaddingMode.Magenta:
         def_color = (255, 0, 255, 255)
 
     image = Image.new("RGBA", (w, h), def_color)
@@ -192,7 +177,7 @@ if __name__ == "__main__":
         image.paste(tile.image, (tile.x, tile.y))
 
     # 5. Fill padding:
-    if args.padding > 0 and args.padding_mode != PaddingMode.Transparent:
+    if args.padding > 0 and args.padding_mode != src.PaddingMode.Transparent:
         padder = None
         # if args.padding_mode == PaddingMode.Black:
         #    padder = ColorPadding()
@@ -200,8 +185,8 @@ if __name__ == "__main__":
         #    padder = ColorPadding((255, 255, 255, 255))
         # elif args.padding_mode == PaddingMode.Magenta:
         #    padder = ColorPadding((255, 0, 255, 255))
-        if args.padding_mode == PaddingMode.Fill:
-            padder = FillPadding()
+        if args.padding_mode == src.PaddingMode.Fill:
+            padder = src.FillPadding()
 
         if padder:
             padder.fill(image, tiles, args.padding)
@@ -210,4 +195,4 @@ if __name__ == "__main__":
     image.save(args.output)
 
     if args.csv:
-        CSVWriter.write(args.csv, tiles)
+        src.CSVWriter.write(args.csv, tiles)

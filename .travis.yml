@@ -18,7 +18,7 @@ script:
     - LANG=C py.test
     - LANG=en_US.utf-8 py.test
     - py.test --cov=src
-    - python -m src "--version"
+    - ./src.sh --version
 
 sudo: false
 

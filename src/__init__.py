@@ -10,10 +10,13 @@ from padding.padding import Padding
 from padding.color_padding import ColorPadding
 from padding.fill_padding import FillPadding
 
-from packer.packer import Packer
-from packer.tight_packer import TightPacker
-
 from filter.filter import Filter
 from filter.std_filter import StandardFilter
 
-from src.__main__ import SRC_VERSION, SRC_VERSION_STR
+from packer.packer import Packer
+from packer.tight_packer import TightPacker
+
+from csv_writer import CSVWriter
+
+VERSION = [0, 1]
+VERSION_STR = '{}.{}'.format(VERSION[0], VERSION[1])
