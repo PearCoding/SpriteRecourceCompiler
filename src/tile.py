@@ -3,8 +3,8 @@ from PIL import Image
 from enum import Enum, unique
 
 
-""" Simple Tile class holding information """
 class Tile:
+    """ Simple Tile class holding information """
     def __init__(self, file, raw=False):
         if raw:
             self.image = file

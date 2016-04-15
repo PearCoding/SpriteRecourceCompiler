@@ -8,4 +8,4 @@ class ResizeNode(ProcessingNode):
         self.quality = quality
 
     def exec(self, processor, img):
-        return [img.resize((self.width, self.height), self.quality.toPIL())]
+        return [img.resize((self.width, self.height), self.quality.to_pil())]

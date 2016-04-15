@@ -1,0 +1,32 @@
+language: python
+python:
+    - 3.3
+    - 3.4
+    - 3.5
+    - nightly
+    - pypy3
+
+install:
+    - travis_retry pip install -e .
+    - travis_retry pip install pytest-cov
+    - travis_retry pip install pytest-travis-fold
+    - travis_retry python setup.py install
+    # Create a separate no-dependencies virtualenv to make sure all imports
+    # of optional-dependencies are guarded.
+    - virtualenv ./nodeps
+    - ./nodeps/bin/python setup.py install
+    - curl-config --version; pip freeze
+
+script:
+    - python $TARGET
+    - python -O $TARGET
+    - LANG=C python $TARGET
+    - LANG=en_US.utf-8 python $TARGET
+    - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then python -bb $TARGET; fi
+    - py.test
+    - py.test --cov=src
+
+sudo: false
+
+matrix:
+    fast_finish: true

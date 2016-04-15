@@ -1,7 +1,8 @@
 import fnmatch
 
-""" Simple filter class """
+
 class Filter:
+    """ Simple filter class """
     def __init__(self):
         self.filters = []
 

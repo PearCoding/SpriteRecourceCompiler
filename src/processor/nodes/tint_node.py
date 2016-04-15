@@ -26,7 +26,7 @@ class TintNode(ProcessingNode):
             r = source[R].point(lambda i: i * (1 - self.opacity) + max(0, self.color[R] + i) * self.opacity)
             g = source[G].point(lambda i: i * (1 - self.opacity) + max(0, self.color[G] + i) * self.opacity)
             b = source[B].point(lambda i: i * (1 - self.opacity) + max(0, self.color[B] + i) * self.opacity)
-        elif self.mode == ImageFilterMode.Normal:
+        else:  # ImageFilterMode.Normal:
             r = source[R].point(lambda i: i * (1 - self.opacity) + self.color[R] * self.opacity)
             g = source[G].point(lambda i: i * (1 - self.opacity) + self.color[G] * self.opacity)
             b = source[B].point(lambda i: i * (1 - self.opacity) + self.color[B] * self.opacity)

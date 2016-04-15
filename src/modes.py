@@ -62,7 +62,7 @@ class ResamplingMode(Enum):
     def __str__(self):
         return '{0}'.format(self.name)
 
-    def toPIL(self):
+    def to_pil(self):
         if self == ResamplingMode.Nearest:
             return Image.NEAREST
         elif self == ResamplingMode.Bilinear:

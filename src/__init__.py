@@ -16,4 +16,4 @@ from packer.tight_packer import TightPacker
 from filter.filter import Filter
 from filter.std_filter import StandardFilter
 
-from src.src import SRC_VERSION, SRC_VERSION_STR
+from src.__main__ import SRC_VERSION, SRC_VERSION_STR

@@ -34,7 +34,7 @@ class AddNode(ProcessingNode):
                 elif self.size_mode == AddScaleMode.Min:
                     width = min(img.width, other.width)
                     height = min(img.height, other.height)
-                else:# Clamp
+                else:  # Clamp
                     width = img.width
                     height = img.height
 
