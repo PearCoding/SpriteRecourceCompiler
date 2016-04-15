@@ -18,13 +18,11 @@ install:
     - curl-config --version; pip freeze
 
 script:
-    - python $TARGET
-    - python -O $TARGET
-    - LANG=C python $TARGET
-    - LANG=en_US.utf-8 python $TARGET
-    - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then python -bb $TARGET; fi
     - py.test
+    - LANG=C py.test
+    - LANG=en_US.utf-8 py.test
     - py.test --cov=src
+    - python -m src "--version"
 
 sudo: false
 
