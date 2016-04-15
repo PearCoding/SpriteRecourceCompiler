@@ -11,10 +11,6 @@ install:
     - travis_retry pip install pytest-cov
     - travis_retry pip install pytest-travis-fold
     - travis_retry python setup.py install
-    # Create a separate no-dependencies virtualenv to make sure all imports
-    # of optional-dependencies are guarded.
-    - virtualenv ./nodeps
-    - ./nodeps/bin/python setup.py install
     - curl-config --version; pip freeze
 
 script:
