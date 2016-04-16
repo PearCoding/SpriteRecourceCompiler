@@ -3,7 +3,7 @@ import pytest
 
 
 def get_tile():
-    return src.Tile("sand.png")
+    return src.Tile("./src/tests/test.png")
 
 
 def test_nofile():
