@@ -7,7 +7,7 @@ class XMLError(SRCException):
         self.str = str
 
     def __str__(self):
-        return 'XML Error: {}'.format(self.str)
+        return 'XML Error: {0}'.format(self.str)
 
 
 class ProcessorError(SRCException):
@@ -15,4 +15,4 @@ class ProcessorError(SRCException):
         self.str = str
 
     def __str__(self):
-        return 'Processing Error: {}'.format(self.str)
+        return 'Processing Error: {0}'.format(self.str)

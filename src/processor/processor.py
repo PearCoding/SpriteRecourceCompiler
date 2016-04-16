@@ -27,7 +27,7 @@ class Processor:
                 raise ProcessorError('Internal error.')
 
             if not len(ret):
-                raise ProcessorError('No outputs from label "{}"'.format(part))
+                raise ProcessorError('No outputs from label "{0}"'.format(part))
             res.extend(ret)
 
         return res

@@ -77,7 +77,7 @@ if __name__ == "__main__":
                         help='make the output image size square')
     parser.add_argument('--debug', dest='debug', action='store_true',
                         help='draw debug information as well (DEBUG)')
-    parser.add_argument('--version', action='version', version='{} {} with PILLOW {}'.format(
+    parser.add_argument('--version', action='version', version='{0} {1} with PILLOW {2}'.format(
                             APP_NAME, src.VERSION_STR, PILLOW_VERSION))
 
     args = parser.parse_args()
@@ -191,7 +191,7 @@ if __name__ == "__main__":
         if padder:
             padder.fill(image, tiles, args.padding)
 
-    print("Output: {} [{}x{}]".format(args.output, image.width, image.height))
+    print("Output: {0} [{1}x{2}]".format(args.output, image.width, image.height))
     image.save(args.output)
 
     if args.csv:

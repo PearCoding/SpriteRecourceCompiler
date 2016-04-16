@@ -19,4 +19,4 @@ from .packer.tight_packer import TightPacker
 from .csv_writer import CSVWriter
 
 VERSION = [1, 0]
-VERSION_STR = '1.0'
+VERSION_STR = '{0}.{1}'.format(VERSION[0], VERSION[1])

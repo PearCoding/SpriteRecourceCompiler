@@ -82,7 +82,7 @@ class Parser:
                                             Parser.parse_scale_mode(node.getAttribute('scale')))
                         output_node.add(node_node)
                     else:
-                        raise XMLError("Unknown processing node '{}'".format(node.tagName))
+                        raise XMLError("Unknown processing node '{0}'".format(node.tagName))
 
                 processor.add(output_node)
 
