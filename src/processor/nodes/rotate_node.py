@@ -7,7 +7,7 @@ class RotateNode(ProcessingNode):
         self.degree = degree
         self.quality = quality
 
-    def exec(self, processor, img):
+    def execute(self, processor, img):
         if self.degree == 360:
             return [img]
 

@@ -12,7 +12,7 @@ class AddNode(ProcessingNode):
         self.opacity = opacity
         self.size_mode = size
 
-    def exec(self, processor, img):
+    def execute(self, processor, img):
         imgs = []
         if self.type == InputTypeMode.File:
             for file in processor.files:

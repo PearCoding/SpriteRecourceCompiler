@@ -1,5 +1,5 @@
 class ProcessingNode:
-    def exec(self, processor, img):
+    def execute(self, processor, img):
         raise NotImplementedError()
 
     def dependencies(self, processor):

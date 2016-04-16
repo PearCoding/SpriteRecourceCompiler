@@ -115,7 +115,7 @@ if __name__ == "__main__":
         for file in args.processorfile:
             parser = src.Parser(file)
             parser.parse(processor)
-        for output in processor.exec(tileFiles):
+        for output in processor.execute(tileFiles):
             tiles.append(src.Tile(output, True))
     else:
         for file in tileFiles:

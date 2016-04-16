@@ -7,7 +7,7 @@ class MirrorNode(ProcessingNode):
         self.horz = horz
         self.vert = vert
 
-    def exec(self, processor, img):
+    def execute(self, processor, img):
         if self.horz:
             return [img.transpose(Image.FLIP_TOP_BOTTOM)]
         if self.vert:

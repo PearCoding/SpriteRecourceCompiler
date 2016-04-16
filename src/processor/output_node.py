@@ -21,7 +21,7 @@ class OutputNode:
     def add(self, node):
         self.nodes.append(node)
 
-    def exec(self, processor, imgs):
+    def execute(self, processor, imgs):
         res = []
         for img in imgs:
             if self.from_node or fnmatch.fnmatchcase(os.path.basename(img), self.input_filter):
@@ -32,7 +32,7 @@ class OutputNode:
                 for node in self.nodes:
                     new_tmp = []
                     for o in tmp:
-                        new_tmp.extend(node.exec(processor, o))
+                        new_tmp.extend(node.execute(processor, o))
                     tmp = new_tmp
                 res.extend(tmp)
         self.production = res

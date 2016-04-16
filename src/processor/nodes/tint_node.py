@@ -9,7 +9,7 @@ class TintNode(ProcessingNode):
         self.mode = mode
         self.opacity = opacity
 
-    def exec(self, processor, img):
+    def execute(self, processor, img):
         R, G, B = 0, 1, 2
 
         source = img.split()

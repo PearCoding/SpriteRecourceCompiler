@@ -65,13 +65,13 @@ class Processor:
                 res = []
                 for dependency in output.from_dependencies:
                     res.extend(self.exec_rec(dependency, imgs, stack))
-                ret = output.exec(self, res)
+                ret = output.execute(self, res)
             else:
-                ret = output.exec(self, imgs)
+                ret = output.execute(self, imgs)
             stack.pop()
             return ret
 
-    def exec(self, imgs):
+    def execute(self, imgs):
         self.files = imgs
         self.setup_dependencies()
 
