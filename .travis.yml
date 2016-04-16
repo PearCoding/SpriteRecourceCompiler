@@ -7,9 +7,11 @@ python:
     - 3.4
     - 3.5
     - nightly
+    - pypy
     - pypy3
 
 install:
+    - if [[ $TRAVIS_PYTHON_VERSION == 2* || $TRAVIS_PYTHON_VERSION == 'pypy'*]]; then travis_retry pip install enum34; fi
     - travis_retry pip install -e .
     - travis_retry pip install pytest-cov
     - travis_retry pip install pytest-travis-fold
@@ -21,7 +23,9 @@ script:
     - LANG=C py.test
     - LANG=en_US.utf-8 py.test
     - py.test --cov=src
-    - ./src.sh --version
+    - python run.py --version
+    - LANG=C python run.py --version
+    - LANG=en_US.utf-8 python run.py --version
 
 sudo: false
 
