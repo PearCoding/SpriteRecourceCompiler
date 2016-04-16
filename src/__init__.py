@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from .exceptions import *
 
 from .modes import AddScaleMode, ImageFilterMode, InputTypeMode, PackMode, PaddingMode, ResamplingMode
