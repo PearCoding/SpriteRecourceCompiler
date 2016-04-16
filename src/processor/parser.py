@@ -8,6 +8,7 @@ from .nodes.blur_node import BlurNode
 from .nodes.mirror_node import MirrorNode
 from .nodes.rotate_node import RotateNode
 from .nodes.scale_node import ScaleNode
+from .nodes.resize_node import ResizeNode
 from .nodes.tint_node import TintNode
 
 from ..exceptions import *
@@ -15,8 +16,15 @@ from ..modes import *
 
 
 class Parser:
-    def __init__(self, file):
+    def __init__(self):
+        self.root = None
+
+    def from_file(self, file):
         DOMTree = xml.dom.minidom.parse(file)
+        self.root = DOMTree.documentElement
+
+    def from_string(self, string):
+        DOMTree = xml.dom.minidom.parseString(string.strip())
         self.root = DOMTree.documentElement
 
     def parse(self, processor):
@@ -59,6 +67,14 @@ class Parser:
 
                         x_scale, y_scale = Parser.parse_scale_factor(node.getAttribute('factor'))
                         node_node = ScaleNode(x_scale, y_scale,
+                                              Parser.parse_resampling_mode(node.getAttribute('quality')))
+                        output_node.add(node_node)
+                    elif node.tagName == 'resize':
+                        if not node.hasAttribute('size'):
+                            raise XMLError("resize node has no required 'size' attribute.")
+
+                        x_width, y_width = Parser.parse_scale_factor(node.getAttribute('size'))
+                        node_node = ResizeNode(x_width, y_width,
                                               Parser.parse_resampling_mode(node.getAttribute('quality')))
                         output_node.add(node_node)
                     elif node.tagName == 'rotate':

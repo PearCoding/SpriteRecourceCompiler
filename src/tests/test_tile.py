@@ -3,10 +3,10 @@ import pytest
 
 
 def get_tile():
-    return src.Tile("./src/tests/test.png")
+    return src.Tile("./src/tests/files/test_1.png")
 
 
-def test_nofile():
+def test_no_file():
     with pytest.raises(IOError):
         tile = src.Tile("nope")
 

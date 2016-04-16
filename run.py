@@ -91,8 +91,7 @@ if __name__ == "__main__":
         for path in args.filterfile:
             filter.parse(path)
     else:
-        for case in src.StandardFilter:
-            filter.add(case)
+        filter = src.get_standard_filter()
 
     # 1. Read image files
     tileFiles = []
@@ -113,7 +112,8 @@ if __name__ == "__main__":
     if args.processorfile and len(args.processorfile) > 0:
         processor = src.Processor()
         for file in args.processorfile:
-            parser = src.Parser(file)
+            parser = src.Parser()
+            parser.from_file(file)
             parser.parse(processor)
         for output in processor.execute(tileFiles):
             tiles.append(src.Tile(output, True))

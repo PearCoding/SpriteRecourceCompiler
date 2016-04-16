@@ -8,7 +8,7 @@ class Filter:
 
     def parse(self, path):
         for line in open(path, 'r'):
-            self.add(line)
+            self.add(line.strip())
 
     def add(self, case):
         if case not in self.filters:

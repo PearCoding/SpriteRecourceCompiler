@@ -8,4 +8,4 @@ class ScaleNode(ProcessingNode):
         self.quality = quality
 
     def execute(self, processor, img):
-        return [img.resize((int(img.width*self.x_scale), int(img.height*self.y_scale)), self.quality.toPIL())]
+        return [img.resize((int(img.width*self.x_scale), int(img.height*self.y_scale)), self.quality.to_pil())]

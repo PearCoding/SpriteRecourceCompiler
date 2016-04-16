@@ -3,8 +3,8 @@ from ..processing_node import ProcessingNode
 
 class ResizeNode(ProcessingNode):
     def __init__(self, width, height, quality):
-        self.width = width
-        self.height = height
+        self.width = int(width)
+        self.height = int(height)
         self.quality = quality
 
     def execute(self, processor, img):

@@ -11,7 +11,7 @@ from .padding.color_padding import ColorPadding
 from .padding.fill_padding import FillPadding
 
 from .filter.filter import Filter
-from .filter.std_filter import StandardFilter
+from .filter.std_filter import StandardFilterCases, get_standard_filter
 
 from .packer.packer import Packer
 from .packer.tight_packer import TightPacker
