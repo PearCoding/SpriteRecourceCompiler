@@ -1,9 +1,9 @@
 from .exceptions import *
 
-from .modes import *
+from .modes import AddScaleMode, ImageFilterMode, InputTypeMode, PackMode, PaddingMode, ResamplingMode
 from .tile import Tile
 
-from .processor.processor import *
+from .processor.processor import Processor
 from .processor.parser import Parser
 
 from .padding.padding import Padding
