@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/PearCoding/SpriteResourceCompiler.svg?branch=master)](https://travis-ci.org/PearCoding/SpriteResourceCompiler)
+
 # Sprite Resource Compiler
 A basic resource compiler for sprites and 2D games.
 
