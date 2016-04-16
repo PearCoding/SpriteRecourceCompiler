@@ -1,5 +1,5 @@
-from processor.processing_node import ProcessingNode
-from modes import *
+from ..processing_node import ProcessingNode
+from ...modes import *
 
 import fnmatch
 

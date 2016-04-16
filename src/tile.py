@@ -1,6 +1,4 @@
-import os
 from PIL import Image
-from enum import Enum, unique
 
 
 class Tile:

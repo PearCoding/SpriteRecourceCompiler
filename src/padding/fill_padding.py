@@ -1,4 +1,4 @@
-from padding.padding import Padding
+from .padding import Padding
 
 from PIL import ImageDraw
 

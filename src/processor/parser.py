@@ -1,17 +1,17 @@
 import xml.dom.minidom
 from PIL import ImageColor
 
-from processor.output_node import OutputNode
+from .output_node import OutputNode
 
-from processor.nodes.add_node import AddNode
-from processor.nodes.blur_node import BlurNode
-from processor.nodes.mirror_node import MirrorNode
-from processor.nodes.rotate_node import RotateNode
-from processor.nodes.scale_node import ScaleNode
-from processor.nodes.tint_node import TintNode
+from .nodes.add_node import AddNode
+from .nodes.blur_node import BlurNode
+from .nodes.mirror_node import MirrorNode
+from .nodes.rotate_node import RotateNode
+from .nodes.scale_node import ScaleNode
+from .nodes.tint_node import TintNode
 
-from exceptions import *
-from modes import *
+from ..exceptions import *
+from ..modes import *
 
 
 class Parser:

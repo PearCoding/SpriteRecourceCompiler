@@ -1,6 +1,6 @@
 from PIL import Image
-from processor.processing_node import ProcessingNode
-from modes import ImageFilterMode
+from ..processing_node import ProcessingNode
+from ...modes import ImageFilterMode
 
 
 class TintNode(ProcessingNode):

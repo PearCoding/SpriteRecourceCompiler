@@ -1,4 +1,4 @@
-from processor.processing_node import ProcessingNode
+from ..processing_node import ProcessingNode
 
 
 class ResizeNode(ProcessingNode):

@@ -1,4 +1,4 @@
-from packer.packer import Packer
+from .packer import Packer
 from collections import deque
 import sys
 

@@ -1,4 +1,4 @@
-from processor.processing_node import ProcessingNode
+from ..processing_node import ProcessingNode
 from PIL import ImageFilter
 
 
