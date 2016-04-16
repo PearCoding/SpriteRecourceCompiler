@@ -18,5 +18,5 @@ from .packer.tight_packer import TightPacker
 
 from .csv_writer import CSVWriter
 
-VERSION = [0, 1]
-VERSION_STR = '{}.{}'.format(VERSION[0], VERSION[1])
+VERSION = [1, 0]
+VERSION_STR = '1.0'
