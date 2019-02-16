@@ -17,6 +17,7 @@ from .packer.packer import Packer
 from .packer.tight_packer import TightPacker
 
 from .csv_writer import CSVWriter
+from .dl_writer import DLWriter
 
 VERSION = [1, 0]
 VERSION_STR = '{0}.{1}'.format(VERSION[0], VERSION[1])

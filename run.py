@@ -10,17 +10,20 @@ APP_NAME = "SpriteResourceCompiler (SRC)"
 
 def readable_dir(string):
     if not os.path.isdir(string):
-        raise argparse.ArgumentTypeError("{0} is not a valid path".format(string))
+        raise argparse.ArgumentTypeError(
+            "{0} is not a valid path".format(string))
     if os.access(string, os.R_OK):
         return string
     else:
-        raise argparse.ArgumentTypeError("{0} is not a readable dir".format(string))
+        raise argparse.ArgumentTypeError(
+            "{0} is not a readable dir".format(string))
 
 
 # TODO: Should check if it's possible to write, etc.
 def get_file_name(string):
     if os.path.isdir(string):
-        raise argparse.ArgumentTypeError("{0} is not a valid path".format(string))
+        raise argparse.ArgumentTypeError(
+            "{0} is not a valid path".format(string))
     else:
         return string
 
@@ -29,7 +32,8 @@ def get_pack_mode(string):
     if string.lower() == 'tight':
         return src.PackMode.Tight
     else:
-        raise argparse.ArgumentTypeError("{0} is not a valid mode".format(string))
+        raise argparse.ArgumentTypeError(
+            "{0} is not a valid mode".format(string))
 
 
 def get_padding_mode(string):
@@ -44,17 +48,21 @@ def get_padding_mode(string):
     elif string.lower() == 'fill':
         return src.PaddingMode.Fill
     else:
-        raise argparse.ArgumentTypeError("{0} is not a valid mode".format(string))
+        raise argparse.ArgumentTypeError(
+            "{0} is not a valid mode".format(string))
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Generates tilemap from single sprites.')
+    parser = argparse.ArgumentParser(
+        description='Generates tilemap from single sprites.')
     parser.add_argument('DIR', type=readable_dir, nargs='+',
                         help='the used directory to search for images')
     parser.add_argument('-o', '--output', dest='output', type=get_file_name, required=True,
                         help='the output file')
     parser.add_argument('-l', '--list', dest='csv', type=get_file_name,
-                        help='optional csv file with the positions of every sprite')
+                        help='optional csv file output with the positions of every sprite')
+    parser.add_argument('-dl', '--datalisp', dest='dl', type=get_file_name,
+                        help='optional datalisp file with the positions and name of every sprite')
     parser.add_argument('-r', '--recursive', dest='recursive', action='store_true',
                         help='search directories and subdirectories recursively')
     parser.add_argument('-f', '--filter', dest='filter', nargs='*',
@@ -78,7 +86,7 @@ if __name__ == "__main__":
     parser.add_argument('--debug', dest='debug', action='store_true',
                         help='draw debug information as well (DEBUG)')
     parser.add_argument('--version', action='version', version='{0} {1} with PILLOW {2}'.format(
-                            APP_NAME, src.VERSION_STR, PILLOW_VERSION))
+        APP_NAME, src.VERSION_STR, PILLOW_VERSION))
 
     args = parser.parse_args()
 
@@ -100,7 +108,8 @@ if __name__ == "__main__":
             for root, dirs, files in os.walk(dir):
                 for file in files:
                     if filter.check(os.path.basename(file)):
-                        tileFiles.append(os.path.abspath(os.path.join(root, file)))
+                        tileFiles.append(os.path.abspath(
+                            os.path.join(root, file)))
         else:
             for file in os.listdir(dir):
                 if filter.check(os.path.basename(file)):
@@ -115,12 +124,13 @@ if __name__ == "__main__":
             parser = src.Parser()
             parser.from_file(file)
             parser.parse(processor)
-        for output in processor.execute(tileFiles):
-            tiles.append(src.Tile(output, True))
+        outputs = processor.execute(tileFiles)
+        for output in outputs:
+            tiles.append(src.Tile(output.name, output.file, True))
     else:
         for file in tileFiles:
             try:
-                tile = src.Tile(file)
+                tile = src.Tile("_unknown_", file)
                 tiles.append(tile)
             except IOError as e:
                 print(e)
@@ -155,8 +165,8 @@ if __name__ == "__main__":
 
     # Setup sizes
     if args.pow:
-        w = int(math.pow(2, math.ceil(math.log2(w))))
-        h = int(math.pow(2, math.ceil(math.log2(h))))
+        w = int(math.pow(2, math.ceil(math.log(w, 2))))
+        h = int(math.pow(2, math.ceil(math.log(h, 2))))
 
     if args.square:
         w = max(w, h)
@@ -191,8 +201,12 @@ if __name__ == "__main__":
         if padder:
             padder.fill(image, tiles, args.padding)
 
-    print("Output: {0} [{1}x{2}]".format(args.output, image.width, image.height))
+    print("Output: {0} [{1}x{2}]".format(
+        args.output, image.width, image.height))
     image.save(args.output)
 
     if args.csv:
         src.CSVWriter.write(args.csv, tiles)
+
+    if args.dl:
+        src.DLWriter.write(args.dl, tiles)

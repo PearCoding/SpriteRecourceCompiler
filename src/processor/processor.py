@@ -27,7 +27,8 @@ class Processor:
                 raise ProcessorError('Internal error.')
 
             if not len(ret):
-                raise ProcessorError('No outputs from label "{0}"'.format(part))
+                raise ProcessorError(
+                    'No outputs from label "{0}"'.format(part))
             res.extend(ret)
 
         return res
@@ -55,7 +56,8 @@ class Processor:
 
     def exec_rec(self, output, imgs, stack):
         if output in stack:
-            raise ProcessorError('Cyclic dependency in processing graph found.')
+            raise ProcessorError(
+                'Cyclic dependency in processing graph found.')
 
         if output.production:
             return output.production
@@ -82,6 +84,17 @@ class Processor:
         res = []
         for output in self.outputs:
             if not output.suppress:
-                res.extend(output.production)
+                name = output.label if output.label else "_unknown_"
+                if len(output.production) == 1:
+                    res.append(type('processor_output', (object,),
+                                    {"name": name,
+                                     "file": output.production[0]}))
+                else:
+                    counter = 1
+                    for prod in output.production:
+                        res.append(type('processor_output', (object,),
+                                        {"name": "%s_%i" % (name, counter),
+                                         "file": prod}))
+                        counter += 1
 
         return res

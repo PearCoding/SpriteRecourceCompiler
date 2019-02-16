@@ -33,20 +33,22 @@ class Parser:
 
         for input in self.root.getElementsByTagName('input'):
             if not input.hasAttribute('filter') and not input.hasAttribute('from'):
-                raise XMLError('input node has no required "filter" or "from" attribute.')
+                raise XMLError(
+                    'input node has no required "filter" or "from" attribute.')
 
             if input.hasAttribute('filter') and input.hasAttribute('from'):
-                raise XMLError('input node has both "filter" and "from" attribute, but only one is allowed.')
+                raise XMLError(
+                    'input node has both "filter" and "from" attribute, but only one is allowed.')
 
             for output in input.getElementsByTagName('output'):
                 output_node = OutputNode(input_filter=input.getAttribute('filter'),
                                          from_node=input.getAttribute('from'),
-                                         label=
-                                         output.getAttribute('label') if output.hasAttribute('label') else None,
-                                         input_label=
-                                         input.getAttribute('label') if input.hasAttribute('label') else None,
-                                         package_label=
-                                         self.root.getAttribute('label') if self.root.hasAttribute('label') else None,
+                                         label=output.getAttribute('label') if output.hasAttribute(
+                                             'label') else None,
+                                         input_label=input.getAttribute('label') if input.hasAttribute(
+                                             'label') else None,
+                                         package_label=self.root.getAttribute(
+                                             'label') if self.root.hasAttribute('label') else None,
                                          suppress=Parser.parse_boolean(output.getAttribute('suppress')))
 
                 nodes = output.childNodes
@@ -57,32 +59,38 @@ class Parser:
 
                     if node.tagName == 'tint':
                         node_node = TintNode(Parser.parse_color(node.getAttribute('color')),
-                                             Parser.parse_filter_mode(node.getAttribute('mode')),
+                                             Parser.parse_filter_mode(
+                                                 node.getAttribute('mode')),
                                              max(0, min(1, float(node.getAttribute('opacity')))) if
                                              node.hasAttribute('opacity') else 1)
                         output_node.add(node_node)
                     elif node.tagName == 'scale':
                         if not node.hasAttribute('factor'):
-                            raise XMLError("scale node has no required 'factor' attribute.")
+                            raise XMLError(
+                                "scale node has no required 'factor' attribute.")
 
-                        x_scale, y_scale = Parser.parse_scale_factor(node.getAttribute('factor'))
+                        x_scale, y_scale = Parser.parse_scale_factor(
+                            node.getAttribute('factor'))
                         node_node = ScaleNode(x_scale, y_scale,
                                               Parser.parse_resampling_mode(node.getAttribute('quality')))
                         output_node.add(node_node)
                     elif node.tagName == 'resize':
                         if not node.hasAttribute('size'):
-                            raise XMLError("resize node has no required 'size' attribute.")
+                            raise XMLError(
+                                "resize node has no required 'size' attribute.")
 
-                        x_width, y_width = Parser.parse_scale_factor(node.getAttribute('size'))
+                        x_width, y_width = Parser.parse_scale_factor(
+                            node.getAttribute('size'))
                         node_node = ResizeNode(x_width, y_width,
-                                              Parser.parse_resampling_mode(node.getAttribute('quality')))
+                                               Parser.parse_resampling_mode(node.getAttribute('quality')))
                         output_node.add(node_node)
                     elif node.tagName == 'rotate':
                         node_node = RotateNode(float(node.getAttribute('degree')),
                                                Parser.parse_resampling_mode(node.getAttribute('quality')))
                         output_node.add(node_node)
                     elif node.tagName == 'mirror':
-                        horz, vert = Parser.parse_mirror_dir(node.getAttribute('direction'))
+                        horz, vert = Parser.parse_mirror_dir(
+                            node.getAttribute('direction'))
                         node_node = MirrorNode(horz, vert)
                         output_node.add(node_node)
                     elif node.tagName == 'blur':
@@ -91,14 +99,17 @@ class Parser:
                         output_node.add(node_node)
                     elif node.tagName == 'add':
                         node_node = AddNode(node.getAttribute('input'),
-                                            Parser.parse_input_type(node.getAttribute('input_type')),
-                                            Parser.parse_filter_mode(node.getAttribute('mode')),
+                                            Parser.parse_input_type(
+                                                node.getAttribute('input_type')),
+                                            Parser.parse_filter_mode(
+                                                node.getAttribute('mode')),
                                             max(0, min(1, float(node.getAttribute('opacity')))) if
                                             node.hasAttribute('opacity') else 1,
                                             Parser.parse_scale_mode(node.getAttribute('scale')))
                         output_node.add(node_node)
                     else:
-                        raise XMLError("Unknown processing node '{0}'".format(node.tagName))
+                        raise XMLError(
+                            "Unknown processing node '{0}'".format(node.tagName))
 
                 processor.add(output_node)
 

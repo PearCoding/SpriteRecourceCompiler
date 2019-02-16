@@ -3,11 +3,13 @@ from PIL import Image
 
 class Tile:
     """ Simple Tile class holding information """
-    def __init__(self, file, raw=False):
+
+    def __init__(self, name, file, raw=False):
         if raw:
             self.image = file
         else:
             self.image = Image.open(file)
+        self.name = name
         self.width = self.image.width
         self.height = self.image.height
         self.x = -1
